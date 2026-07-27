@@ -1,0 +1,81 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+.env
+.venv
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# Database files (if using SQLite)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+clinic.db
+clinic.db.backup
+
+# Sensitive data
+*.env
+*.secret
+*.key
+*.pem
+config.py
+settings.py
+secrets.py
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.iml
+
+# Python distribution/packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+*.cover
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Deployment
+*.pid
+*.pid.lock
+
+# Node modules (if you have any frontend stuff)
+node_modules/
+
+# Flask specific
+instance/
+*.sqlite
+*.sqlite3
+
+# OS files
+Thumbs.db
+Desktop.ini
+.directory*.mp4
+
+
+#videos
+*.mp4
