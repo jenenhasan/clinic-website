@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Patient Login — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container" style="padding:56px 0; max-width:400px; margin:0 auto;">
+  <div class="panel">
+    <div class="eyebrow">{% if is_rtl %}بوابة المرضى{% else %}Patient Portal{% endif %}</div>
+    <h2>{% if is_rtl %}تسجيل الدخول{% else %}Login{% endif %}</h2>
+    <p style="color:var(--text-light);">{% if is_rtl %}تسجيل الدخول لإدارة مواعيدك{% else %}Login to manage your appointments{% endif %}</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    
+    <form method="POST">
+      <div class="field">
+        <label>{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}كلمة المرور{% else %}Password{% endif %}</label>
+        <input type="password" name="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+        <i class="fas fa-sign-in-alt"></i> {% if is_rtl %}تسجيل الدخول{% else %}Login{% endif %}
+      </button>
+    </form>
+    
+    <p style="text-align:center; margin-top:16px;">
+      {% if is_rtl %}ليس لديك حساب؟ <a href="{{ url_for('patient_register') }}">تسجيل جديد</a>{% else %}Don't have an account? <a href="{{ url_for('patient_register') }}">Register</a>{% endif %}
+    </p>
+  </div>
+</section>
+
+{% endblock %}

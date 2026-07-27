@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Contact — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="section" style="padding-top:40px;">
+  <div class="container">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px; max-width:900px; margin:0 auto;">
+      <div>
+        <span class="label">{% if is_rtl %}اتصل بنا{% else %}Contact Us{% endif %}</span>
+        <h1>{% if is_rtl %}تواصل معنا{% else %}Get in Touch{% endif %}</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('contact') }}">
+          <div class="field">
+            <label>{% if is_rtl %}الاسم الكامل{% else %}Full Name{% endif %} *</label>
+            <input type="text" name="name" value="{{ form.get('name', '') }}" required>
+          </div>
+          <div class="field">
+            <label>{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %} *</label>
+            <input type="email" name="email" value="{{ form.get('email', '') }}" required>
+          </div>
+          <div class="field">
+            <label>{% if is_rtl %}رقم الهاتف{% else %}Phone{% endif %}</label>
+            <input type="tel" name="phone" value="{{ form.get('phone', '') }}">
+          </div>
+          <div class="field">
+            <label>{% if is_rtl %}الرسالة{% else %}Message{% endif %} *</label>
+            <textarea name="message" rows="4" required>{{ form.get('message', '') }}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> {% if is_rtl %}إرسال{% else %}Send{% endif %}
+          </button>
+        </form>
+      </div>
+      
+      <div>
+        <div class="panel">
+          <h3 style="font-family:var(--font-primary); font-size:1rem;">{% if is_rtl %}معلومات الاتصال{% else %}Contact Information{% endif %}</h3>
+          <div style="margin-top:16px;">
+            <p><i class="fas fa-map-pin" style="color:var(--accent); width:24px;"></i> {{ get_config('address') }}</p>
+            <p><i class="fas fa-phone" style="color:var(--accent); width:24px;"></i> {{ CONFIG.phone }}</p>
+            <p><i class="fas fa-envelope" style="color:var(--accent); width:24px;"></i> {{ CONFIG.email }}</p>
+            <p><i class="fas fa-clock" style="color:var(--accent); width:24px;"></i> {{ get_config('hours') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

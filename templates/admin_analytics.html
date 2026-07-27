@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Analytics — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}الإحصائيات{% else %}Analytics{% endif %}</div>
+      <h2>{% if is_rtl %}تحليلات العيادة{% else %}Clinic Analytics{% endif %}</h2>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">
+      <i class="fas fa-arrow-left"></i> {% if is_rtl %}العودة{% else %}Back{% endif %}
+    </a>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:24px;">
+    <div class="panel">
+      <h3 style="font-family:var(--font-primary); font-size:1rem; margin-bottom:16px;">{% if is_rtl %}المواعيد الشهرية{% else %}Monthly Appointments{% endif %}</h3>
+      {% if monthly %}
+      <div style="height:200px; display:flex; align-items:flex-end; gap:8px; padding:8px 0;">
+        {% for m in monthly %}
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+          <div style="width:100%; background:var(--gold); border-radius:4px 4px 0 0; 
+               height:{{ (m.count / (monthly|map(attribute='count')|max) * 100)|int if monthly|map(attribute='count')|max > 0 else 0 }}px; 
+               min-height:4px;">
+          </div>
+          <div style="font-size:0.6rem; font-family:var(--font-mono); color:var(--text-light); margin-top:4px; text-align:center;">
+            {{ m.month[5:] }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">{% if is_rtl %}لا توجد بيانات{% else %}No data{% endif %}</div>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <h3 style="font-family:var(--font-primary); font-size:1rem; margin-bottom:16px;">{% if is_rtl %}توزيع الجنس{% else %}Gender Distribution{% endif %}</h3>
+      {% if gender_stats %}
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        {% for g in gender_stats %}
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+            <span>{{ g.gender or 'Not specified' }}</span>
+            <span>{{ g.count }}</span>
+          </div>
+          <div style="height:20px; background:var(--bg-accent); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; background:var(--gold); width:{{ (g.count / (gender_stats|map(attribute='count')|sum) * 100)|int if gender_stats|map(attribute='count')|sum > 0 else 0 }}%;">
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">{% if is_rtl %}لا توجد بيانات{% else %}No data{% endif %}</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

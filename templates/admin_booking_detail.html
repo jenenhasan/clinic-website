@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Booking Details — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container" style="padding:40px 0;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}تفاصيل الموعد{% else %}Booking Details{% endif %}</div>
+      <h2>{{ booking.name }}</h2>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <form method="POST" action="{{ url_for('admin_cancel_booking', booking_id=booking.id) }}" style="display:inline;" onsubmit="return confirm('Cancel this booking?');">
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-times"></i> {% if is_rtl %}إلغاء{% else %}Cancel{% endif %}
+        </button>
+      </form>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">
+        <i class="fas fa-arrow-left"></i> {% if is_rtl %}رجوع{% else %}Back{% endif %}
+      </a>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+    <!-- Booking Info -->
+    <div class="panel">
+      <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin-bottom:16px;">
+        <i class="fas fa-info-circle" style="color:var(--gold);"></i> {% if is_rtl %}معلومات الموعد{% else %}Appointment Info{% endif %}
+      </h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}الخدمة{% else %}Service{% endif %}</div>
+          <div style="font-weight:600;">{{ service_name }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}التاريخ{% else %}Date{% endif %}</div>
+          <div style="font-weight:600;">{{ booking.date }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}الوقت{% else %}Time{% endif %}</div>
+          <div style="font-weight:600;">{{ booking.time }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}الحالة{% else %}Status{% endif %}</div>
+          <div>
+            <span style="padding:2px 10px; border-radius:12px; font-size:0.75rem; background:{% if booking.status == 'confirmed' %}#e7efe6; color:#3d6b45;{% else %}#fee2e2; color:#991b1b;{% endif %}">
+              {{ booking.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Info -->
+    <div class="panel">
+      <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin-bottom:16px;">
+        <i class="fas fa-user" style="color:var(--gold);"></i> {% if is_rtl %}معلومات المريض{% else %}Patient Info{% endif %}
+      </h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}الاسم{% else %}Name{% endif %}</div>
+          <div style="font-weight:600;">{{ booking.name }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}الهاتف{% else %}Phone{% endif %}</div>
+          <div style="font-weight:600;"><a href="tel:{{ booking.phone }}">{{ booking.phone }}</a></div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</div>
+          <div style="font-weight:600;">{{ booking.email or "—" }}</div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase;">{% if is_rtl %}ملاحظات{% else %}Notes{% endif %}</div>
+          <div style="font-weight:600;">{{ booking.notes or "—" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical Notes -->
+  <div class="panel" style="margin-top:24px;">
+    <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin-bottom:16px;">
+      <i class="fas fa-notes-medical" style="color:var(--gold);"></i> {% if is_rtl %}الملاحظات الطبية{% else %}Medical Notes{% endif %}
+    </h3>
+    
+    <form method="POST" action="{{ url_for('admin_add_medical_notes', booking_id=booking.id) }}">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div class="field">
+          <label>{% if is_rtl %}التشخيص{% else %}Diagnosis{% endif %}</label>
+          <input type="text" name="diagnosis" placeholder="{% if is_rtl %}أدخل التشخيص{% else %}Enter diagnosis{% endif %}">
+        </div>
+        <div class="field">
+          <label>{% if is_rtl %}العلاج{% else %}Treatment{% endif %}</label>
+          <input type="text" name="treatment" placeholder="{% if is_rtl %}أدخل خطة العلاج{% else %}Enter treatment plan{% endif %}">
+        </div>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}ملاحظات{% else %}Notes{% endif %}</label>
+        <textarea name="notes" rows="3" placeholder="{% if is_rtl %}أدخل ملاحظات إضافية{% else %}Enter additional notes{% endif %}"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {% if is_rtl %}حفظ الملاحظات{% else %}Save Notes{% endif %}
+      </button>
+    </form>
+
+    {% if medical_records %}
+    <div style="margin-top:16px;">
+      <h4 style="font-family:var(--font-primary); font-size:1rem; margin-bottom:12px;">{% if is_rtl %}السجل الطبي{% else %}Medical History{% endif %}</h4>
+      {% for record in medical_records %}
+      <div style="background:var(--bg-accent); border-radius:var(--radius-sm); padding:12px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="font-weight:600;">{{ record.created_at[:16].replace('T', ' ') }}</span>
+          {% if record.diagnosis %}<span style="color:var(--text-light);">{{ record.diagnosis }}</span>{% endif %}
+        </div>
+        {% if record.treatment %}<div style="font-size:0.9rem;"><strong>Treatment:</strong> {{ record.treatment }}</div>{% endif %}
+        {% if record.notes %}<div style="font-size:0.9rem; color:var(--text-secondary);">{{ record.notes }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Book Appointment — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container" style="padding:56px 0; max-width:600px; margin:0 auto;">
+  <div class="panel">
+    <div class="eyebrow">{% if is_rtl %}حجز موعد{% else %}Book Appointment{% endif %}</div>
+    <h2>{% if is_rtl %}احجز موعدك{% else %}Book Your Appointment{% endif %}</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    
+    <form method="POST">
+      <div class="field">
+        <label>{% if is_rtl %}الخدمة{% else %}Service{% endif %} *</label>
+        <select name="service_id" required>
+          <option value="">{% if is_rtl %}اختر خدمة{% else %}Select a service{% endif %}</option>
+          {% for s in CONFIG.services %}
+          <option value="{{ s.id }}" {% if form.get('service_id') == s.id %}selected{% endif %}>
+            {{ get_text(s.name) }} - {{ s.price }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="field">
+        <label>{% if is_rtl %}التاريخ{% else %}Date{% endif %} *</label>
+        <select name="date" required>
+          <option value="">{% if is_rtl %}اختر تاريخ{% else %}Select a date{% endif %}</option>
+          {% for iso, label in dates %}
+          <option value="{{ iso }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="field">
+        <label>{% if is_rtl %}الوقت{% else %}Time{% endif %} *</label>
+        <select name="time" required>
+          <option value="">{% if is_rtl %}اختر وقت{% else %}Select a time{% endif %}</option>
+          {% for t in TIME_SLOTS %}
+          <option value="{{ t }}">{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="field">
+        <label>{% if is_rtl %}ملاحظات{% else %}Notes{% endif %}</label>
+        <textarea name="notes" rows="3">{{ form.get('notes', '') }}</textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+        <i class="fas fa-check-circle"></i> {% if is_rtl %}تأكيد الحجز{% else %}Confirm Booking{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

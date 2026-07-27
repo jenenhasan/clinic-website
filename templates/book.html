@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Book Appointment — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="booking-shell">
+      <div class="booking-panel">
+        <div class="panel-header">
+          <span class="label">{% if is_rtl %}الخطوة ١-٢-٣{% else %}Step 1-2-3{% endif %}</span>
+          <h2 style="margin:4px 0 8px;">{% if is_rtl %}احجز زيارتك{% else %}Book Your Visit{% endif %}</h2>
+          <p style="color:var(--text-light); margin:0;">
+            {% if is_rtl %}املأ بياناتك لتأكيد موعدك{% else %}Fill in your details to secure your appointment{% endif %}
+          </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash" style="background:#fee2e2; padding:12px 16px; border-radius:var(--radius-sm); color:#991b1b; margin-bottom:16px; border-left:3px solid #ef4444;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('book') }}" id="booking-form">
+          <div class="field">
+            <label for="service_id">{% if is_rtl %}اختر الخدمة{% else %}Choose Service{% endif %}</label>
+            <select name="service_id" id="service_id" required>
+              <option value="" {% if not selected_service %}selected{% endif %} disabled>
+                {% if is_rtl %}اختر خدمة{% else %}Select a service{% endif %}
+              </option>
+              {% for s in CONFIG.services %}
+              <option value="{{ s.id }}" {% if selected_service == s.id %}selected{% endif %}>
+                {{ get_text(s.name) }} — {{ get_text(s.duration) }}, {{ s.price }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label>{% if is_rtl %}اختر التاريخ{% else %}Select Date{% endif %}</label>
+            <div class="date-row" id="date-row">
+              {% for iso, label in dates %}
+              <a class="date-pill {% if iso == selected_date %}active{% endif %}"
+                 data-date="{{ iso }}"
+                 href="{{ url_for('book', date=iso, service=selected_service) }}">{{ label }}</a>
+              {% endfor %}
+            </div>
+            <div class="checking-note" id="checking-note" hidden style="font-size:0.85rem; color:var(--text-light); margin-top:8px;">
+              <i class="fas fa-spinner fa-spin"></i> {% if is_rtl %}جاري التحقق من التوفر…{% else %}Checking availability…{% endif %}
+            </div>
+          </div>
+
+          <input type="hidden" name="date" id="date_field" value="{{ selected_date }}">
+
+          <div class="field">
+            <label>{% if is_rtl %}اختر الوقت{% else %}Select Time{% endif %}</label>
+            <div class="slot-grid" id="slot-grid">
+              {% for t in time_slots %}
+              <label class="slot {% if t in booked_times %}taken{% endif %}" data-time="{{ t }}">
+                <input type="radio" name="time" value="{{ t }}"
+                  {% if t in booked_times %}disabled{% endif %}
+                  {% if form.get('time') == t %}checked{% endif %}>
+                {{ t }}
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="name">{% if is_rtl %}الاسم الكامل{% else %}Full Name{% endif %}</label>
+            <input type="text" name="name" id="name" value="{{ form.get('name', '') }}" placeholder="{% if is_rtl %}مثال: أحمد محمد{% else %}e.g., John Doe{% endif %}" required>
+          </div>
+
+          <div class="field">
+            <label for="phone">{% if is_rtl %}رقم الهاتف{% else %}Phone Number{% endif %}</label>
+            <input type="tel" name="phone" id="phone" value="{{ form.get('phone', '') }}" placeholder="{% if is_rtl %}مثال: ٠٥٠٠٠٠٠٠٠٠{% else %}e.g., +90 548 861 6466{% endif %}" required>
+          </div>
+
+          <div class="field">
+            <label for="email">{% if is_rtl %}البريد الإلكتروني <span style="color:var(--text-light); font-weight:400;">(اختياري)</span>{% else %}Email Address <span style="color:var(--text-light); font-weight:400;">(optional)</span>{% endif %}</label>
+            <input type="email" name="email" id="email" value="{{ form.get('email', '') }}" placeholder="{% if is_rtl %}مثال: ahmed@example.com{% else %}e.g., john@example.com{% endif %}">
+          </div>
+
+          <div class="field">
+            <label for="notes">{% if is_rtl %}ملاحظات إضافية <span style="color:var(--text-light); font-weight:400;">(اختياري)</span>{% else %}Additional Notes <span style="color:var(--text-light); font-weight:400;">(optional)</span>{% endif %}</label>
+            <textarea name="notes" id="notes" placeholder="{% if is_rtl %}أي طلبات خاصة أو معلومات…{% else %}Any special requests or information…{% endif %}">{{ form.get('notes', '') }}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:16px;">
+            <i class="fas fa-check-circle"></i> {% if is_rtl %}تأكيد الموعد{% else %}Confirm Appointment{% endif %}
+          </button>
+        </form>
+      </div>
+
+      <div>
+        <div class="booking-panel" style="margin-bottom:20px;">
+          <h4 style="font-family:var(--font-primary); font-weight:600; margin-bottom:16px;">
+            <i class="fas fa-info-circle" style="color:var(--accent);"></i> {% if is_rtl %}معلومات مفيدة{% else %}Good to Know{% endif %}
+          </h4>
+          
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <i class="fas fa-clock" style="color:var(--secondary); width:20px;"></i>
+              <div>
+                <div style="font-weight:500;">{% if is_rtl %}ساعات العمل{% else %}Office Hours{% endif %}</div>
+                <div style="font-size:0.85rem; color:var(--text-light);">{{ get_config('hours') }}</div>
+              </div>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:12px;">
+              <i class="fas fa-map-pin" style="color:var(--secondary); width:20px;"></i>
+              <div>
+                <div style="font-weight:500;">{% if is_rtl %}الموقع{% else %}Location{% endif %}</div>
+                <div style="font-size:0.85rem; color:var(--text-light);">{{ get_config('address') }}</div>
+              </div>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:12px;">
+              <i class="fas fa-phone" style="color:var(--secondary); width:20px;"></i>
+              <div>
+                <div style="font-weight:500;">{% if is_rtl %}اتصل بنا{% else %}Call Us{% endif %}</div>
+                <div style="font-size:0.85rem; color:var(--text-light);">{{ CONFIG.phone }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="booking-panel" style="background:var(--bg-accent);">
+          <h4 style="font-family:var(--font-primary); font-weight:600; margin-bottom:12px;">
+            <i class="fas fa-shield-alt" style="color:var(--accent);"></i> {% if is_rtl %}بحاجة إلى مساعدة؟{% else %}Need Help?{% endif %}
+          </h4>
+          <p style="font-size:0.9rem; margin:0;">
+            {% if is_rtl %}لديك أسئلة؟ <a href="{{ url_for('contact') }}" style="color:var(--secondary); font-weight:500;">اتصل بنا</a> وسنكون سعداء بمساعدتك.{% else %}Have questions? <a href="{{ url_for('contact') }}" style="color:var(--secondary); font-weight:500;">Contact us</a> and we'll be happy to assist you.{% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const TIME_SLOTS = {{ time_slots | tojson }};
+  const dateField = document.getElementById('date_field');
+  const slotGrid = document.getElementById('slot-grid');
+  const checkingNote = document.getElementById('checking-note');
+  dateField.value = "{{ selected_date }}";
+
+  function renderSlots(booked, keepChecked) {
+    slotGrid.innerHTML = TIME_SLOTS.map(t => {
+      const taken = booked.includes(t);
+      const checked = (t === keepChecked && !taken) ? 'checked' : '';
+      return `<label class="slot ${taken ? 'taken' : ''}" data-time="${t}">
+        <input type="radio" name="time" value="${t}" ${taken ? 'disabled' : ''} ${checked}>
+        ${t}
+      </label>`;
+    }).join('');
+  }
+
+  document.getElementById('date-row').addEventListener('click', async (e) => {
+    const pill = e.target.closest('.date-pill');
+    if (!pill) return;
+    e.preventDefault();
+
+    document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    const iso = pill.dataset.date;
+    dateField.value = iso;
+    checkingNote.hidden = false;
+
+    try {
+      const res = await fetch(`{{ url_for('booked_times') }}?date=${iso}`);
+      const data = await res.json();
+      renderSlots(data.booked, null);
+    } catch (err) {
+      window.location.href = pill.href;
+      return;
+    } finally {
+      checkingNote.hidden = true;
+    }
+
+    const url = new URL(window.location);
+    url.searchParams.set('date', iso);
+    window.history.replaceState({}, '', url);
+  });
+</script>
+
+{% endblock %}

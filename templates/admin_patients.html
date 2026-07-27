@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Patients — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}المرضى{% else %}Patients{% endif %}</div>
+      <h2>{% if is_rtl %}سجل المرضى{% else %}Patient Registry{% endif %}</h2>
+    </div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <form method="GET" style="display:flex; gap:8px;">
+        <input type="text" name="search" placeholder="{% if is_rtl %}بحث...{% else %}Search...{% endif %}" value="{{ search }}" style="padding:10px 14px; border:1px solid var(--border-light); border-radius:var(--radius-sm); font-family:var(--font-primary); width:200px;">
+        <button type="submit" class="btn btn-ghost"><i class="fas fa-search"></i></button>
+      </form>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">
+        <i class="fas fa-arrow-left"></i> {% if is_rtl %}العودة{% else %}Back{% endif %}
+      </a>
+    </div>
+  </div>
+  <!-- Patient List -->
+  {% if patients %}
+  <div class="panel" style="padding:0; overflow:hidden;">
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>MR#</th>
+            <th>{% if is_rtl %}الاسم{% else %}Name{% endif %}</th>
+            <th>{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</th>
+            <th>{% if is_rtl %}الهاتف{% else %}Phone{% endif %}</th>
+            <th>{% if is_rtl %}تاريخ الميلاد{% else %}DOB{% endif %}</th>
+            <th>{% if is_rtl %}الإجراءات{% else %}Actions{% endif %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in patients %}
+          <tr>
+            <td><strong>{{ p.mr_number }}</strong></td>
+            <td>
+              <a href="{{ url_for('admin_patient_detail', patient_id=p.id) }}" style="font-weight:500; color:var(--primary);">
+                {{ p.name }}
+                {% if p.name_ar %}<span style="color:var(--text-light); font-weight:400;">({{ p.name_ar }})</span>{% endif %}
+              </a>
+            </td>
+            <td>{{ p.email }}</td>
+            <td>{{ p.phone }}</td>
+            <td>{{ p.date_of_birth }}</td>
+            <td>
+              <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                <a href="{{ url_for('admin_patient_detail', patient_id=p.id) }}" class="btn btn-ghost" style="padding:4px 12px; font-size:0.75rem;">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="panel empty-state">
+    <div style="font-size:3rem; margin-bottom:16px;">📋</div>
+    <h3 style="font-family:var(--font-primary); font-weight:600;">{% if is_rtl %}لا يوجد مرضى{% else %}No Patients{% endif %}</h3>
+    <p style="color:var(--text-light);">{% if is_rtl %}لم يتم تسجيل أي مرضى بعد{% else %}No patients have been registered yet{% endif %}</p>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}

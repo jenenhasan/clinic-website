@@ -1,0 +1,134 @@
+<!-- templates/services.html - Professional Design with Cards -->
+{% extends "base.html" %}
+{% block title %}Our Services — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<!-- Services Hero -->
+<section style="padding:60px 0 40px; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-accent) 100%);">
+  <div class="container">
+    <div style="max-width: 720px; margin: 0 auto; text-align: center;">
+      <span class="label" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); font-weight:600; display:inline-block; margin-bottom:12px;">
+        {% if is_rtl %}خدماتنا{% else %}Our Services{% endif %}
+      </span>
+      <h1 style="margin-bottom:16px;">{% if is_rtl %}ما نقدمه{% else %}What We Offer{% endif %}</h1>
+      <p style="font-size:1.1rem; color:var(--text-secondary); line-height:1.8; max-width:600px; margin:0 auto;">
+        {% if is_rtl %}نقدم مجموعة شاملة من الخدمات الطبية المصممة لتلبية احتياجاتك الصحية{% else %}We offer a comprehensive range of medical services designed to meet your healthcare needs{% endif %}
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Services List -->
+<section style="padding:60px 0 80px;">
+  <div class="container">
+    <div style="display:grid; grid-template-columns: 1fr; gap:30px; max-width:900px; margin:0 auto;">
+      {% for s in CONFIG.services %}
+      <div class="service-detail-card" style="background:var(--bg-secondary); border-radius:var(--radius-lg); padding:36px 40px; border:1px solid var(--border-light); transition:var(--transition); box-shadow:var(--shadow-sm); display:grid; grid-template-columns: auto 1fr auto; gap:24px; align-items:start;">
+        
+        <!-- Icon -->
+        <div style="width:64px; height:64px; border-radius:50%; background:rgba(200,150,62,0.1); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--accent); flex-shrink:0;">
+          <i class="fas fa-{% if s.id == 'general' %}stethoscope{% elif s.id == 'followup' %}heartbeat{% else %}clipboard-check{% endif %}"></i>
+        </div>
+        
+        <!-- Content -->
+        <div>
+          <h3 style="font-family:var(--font-primary); font-size:1.3rem; font-weight:600; margin-bottom:10px; color:var(--text-primary);">
+            {{ get_text(s.name) }}
+          </h3>
+          <p style="color:var(--text-secondary); line-height:1.8; margin-bottom:16px; font-size:0.95rem;">
+            {{ get_text(s.description) }}
+          </p>
+          
+          <!-- Meta Tags -->
+          <div style="display:flex; gap:24px; flex-wrap:wrap;">
+            <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-light); background:var(--bg-accent); padding:6px 16px; border-radius:var(--radius-full);">
+              <i class="far fa-clock" style="color:var(--secondary);"></i> {{ get_text(s.duration) }}
+            </span>
+            <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600; color:var(--accent); background:rgba(200,150,62,0.08); padding:6px 16px; border-radius:var(--radius-full);">
+              <i class="fas fa-tag"></i> {{ s.price }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Action Button -->
+        <div style="display:flex; align-items:center;">
+          <a href="{{ url_for('book', service=s.id) }}" class="btn btn-primary" style="padding:12px 28px; font-size:0.85rem; white-space:nowrap;">
+            <i class="fas fa-calendar-plus"></i> {% if is_rtl %}احجز{% else %}Book{% endif %}
+          </a>
+        </div>
+        
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Payment Info -->
+<section style="background:var(--bg-accent); padding:56px 0;">
+  <div class="container">
+    <div style="background:var(--bg-secondary); border-radius:var(--radius-lg); padding:40px 48px; border:1px solid var(--border-light); max-width:780px; margin:0 auto; display:flex; align-items:flex-start; gap:24px;">
+      <div style="width:52px; height:52px; border-radius:50%; background:rgba(200,150,62,0.1); display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:1.3rem; flex-shrink:0;">
+        <i class="fas fa-credit-card"></i>
+      </div>
+      <div>
+        <h3 style="font-family:var(--font-primary); font-weight:600; margin:0 0 8px; font-size:1.15rem; color:var(--text-primary);">
+          {% if is_rtl %}الدفع والتأمين{% else %}Payment & Insurance{% endif %}
+        </h3>
+        <p style="margin:0; color:var(--text-secondary); line-height:1.8; font-size:0.95rem;">{{ get_config('insurance_note') }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section style="background:var(--primary); padding:56px 0;">
+  <div class="container" style="text-align:center;">
+    <h2 style="color:white; margin-bottom:12px; font-size:clamp(1.6rem, 2.5vw, 2rem);">
+      {% if is_rtl %}جاهز لحجز موعدك؟{% else %}Ready to Book Your Appointment?{% endif %}
+    </h2>
+    <p style="color:rgba(255,255,255,0.8); max-width:500px; margin:0 auto 28px; font-size:1.05rem; line-height:1.8;">
+      {% if is_rtl %}اختر خدمتك واحجز موعداً اليوم{% else %}Choose your service and book an appointment today{% endif %}
+    </p>
+    <a href="{{ url_for('book') }}" class="btn btn-accent btn-lg" style="padding:16px 48px;">
+      <i class="fas fa-calendar-check"></i> {% if is_rtl %}احجز الآن{% else %}Book Now{% endif %}
+    </a>
+  </div>
+</section>
+
+<style>
+  .service-detail-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-light);
+  }
+  
+  @media (max-width: 768px) {
+    .service-detail-card {
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+      padding: 24px !important;
+      text-align: center;
+    }
+    
+    .service-detail-card > div:first-child {
+      margin: 0 auto;
+    }
+    
+    .service-detail-card > div:last-child {
+      justify-content: center;
+    }
+    
+    .service-detail-card .meta-tags {
+      justify-content: center;
+    }
+    
+    [style*="padding:40px 48px;"] {
+      padding: 24px 20px !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center;
+    }
+  }
+</style>
+
+{% endblock %}

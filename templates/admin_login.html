@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Admin Login — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container" style="padding:56px 0; max-width:400px; margin:0 auto;">
+  <div class="panel" style="text-align:center;">
+    <div style="width:80px; height:80px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; color:white; font-size:2rem;">
+      <i class="fas fa-user-md"></i>
+    </div>
+    <h2>{% if is_rtl %}دخول الموظفين{% else %}Staff Login{% endif %}</h2>
+    <p style="color:var(--text-light); margin-bottom:24px;">
+      {% if is_rtl %}تسجيل الدخول إلى لوحة التحكم{% else %}Login to the admin dashboard{% endif %}
+    </p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <div class="field">
+        <label for="password">{% if is_rtl %}كلمة المرور{% else %}Password{% endif %}</label>
+        <input type="password" name="password" id="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px;">
+        <i class="fas fa-sign-in-alt"></i> {% if is_rtl %}تسجيل الدخول{% else %}Login{% endif %}
+      </button>
+    </form>
+    
+    <p style="margin-top:16px; font-size:0.85rem; color:var(--text-light);">
+      <a href="{{ url_for('index') }}">← {% if is_rtl %}العودة للرئيسية{% else %}Back to Home{% endif %}</a>
+    </p>
+  </div>
+</section>
+
+{% endblock %}

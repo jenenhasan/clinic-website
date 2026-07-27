@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}Booking Confirmed — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="confirmation-shell">
+  <div class="container">
+    <div class="confirmation-card reveal">
+      <!-- Success Icon -->
+      <div class="check">
+        <i class="fas fa-check"></i>
+      </div>
+      
+      <h2>{% if is_rtl %}تم تأكيد الموعد!{% else %}Appointment Confirmed!{% endif %}</h2>
+      <p class="subtitle">
+        {% if is_rtl %}لقد قمنا بحجز موعدك مع {{ get_config('doctor_name') }}{% else %}We've booked your appointment with {{ get_config('doctor_name') }}{% endif %}
+      </p>
+      
+      <!-- Appointment Details -->
+      <div class="details">
+        <div class="row">
+          <span class="label">
+            <i class="fas fa-user"></i> {% if is_rtl %}المريض{% else %}Patient{% endif %}
+          </span>
+          <span class="value">{{ name }}</span>
+        </div>
+        <div class="row">
+          <span class="label">
+            <i class="fas fa-stethoscope"></i> {% if is_rtl %}الخدمة{% else %}Service{% endif %}
+          </span>
+          <span class="value">{{ service_name.en }}</span>
+        </div>
+        <div class="row">
+          <span class="label">
+            <i class="fas fa-calendar-day"></i> {% if is_rtl %}التاريخ{% else %}Date{% endif %}
+          </span>
+          <span class="value">{{ date_label }}</span>
+        </div>
+        <div class="row">
+          <span class="label">
+            <i class="fas fa-clock"></i> {% if is_rtl %}الوقت{% else %}Time{% endif %}
+          </span>
+          <span class="value">{{ time }}</span>
+        </div>
+      </div>
+      
+      <!-- Info Message -->
+      <div class="info-message">
+        <i class="fas fa-info-circle"></i>
+        {% if is_rtl %}يرجى الوصول قبل موعدك بخمس دقائق.{% else %}Please arrive 5 minutes before your appointment time.{% endif %}
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="actions">
+        <a href="{{ url_for('index') }}" class="btn btn-outline">
+          <i class="fas fa-home"></i> {% if is_rtl %}العودة للرئيسية{% else %}Back to Home{% endif %}
+        </a>
+        <a href="{{ url_for('book') }}" class="btn btn-primary">
+          <i class="fas fa-calendar-plus"></i> {% if is_rtl %}حجز آخر{% else %}Book Another{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+    .confirmation-shell {
+        padding: 80px 0;
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .confirmation-card {
+        max-width: 560px;
+        margin: 0 auto;
+        text-align: center;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 52px 44px;
+        box-shadow: var(--shadow-inset-top), var(--shadow-lg);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .confirmation-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-inset-top), var(--shadow-xl);
+    }
+    
+    /* Check Icon */
+    .confirmation-card .check {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(155deg, var(--secondary-light), var(--secondary));
+        color: #fff;
+        font-size: 2.2rem;
+        box-shadow: var(--shadow-inset-top), 0 12px 24px -8px rgba(61, 107, 69, 0.5);
+        animation: pulse-check 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-check {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    .confirmation-card h2 {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+    
+    .confirmation-card .subtitle {
+        color: var(--text-light);
+        font-size: 1.05rem;
+        margin-bottom: 32px;
+    }
+    
+    /* Details Section */
+    .confirmation-card .details {
+        background: var(--bg-accent);
+        border-radius: var(--radius-md);
+        padding: 4px 24px;
+        margin-bottom: 28px;
+        text-align: left;
+        border: 1px solid var(--border-light);
+    }
+    
+    .confirmation-card .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-light);
+        font-size: 0.95rem;
+    }
+    
+    .confirmation-card .row:last-child {
+        border-bottom: none;
+    }
+    
+    .confirmation-card .row .label {
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 500;
+        color: var(--text-light);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .confirmation-card .row .label i {
+        color: var(--accent);
+        width: 18px;
+    }
+    
+    .confirmation-card .row .value {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+    
+    /* Info Message */
+    .confirmation-card .info-message {
+        background: rgba(200, 150, 62, 0.08);
+        border-radius: var(--radius-sm);
+        padding: 12px 18px;
+        margin-bottom: 28px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        border: 1px solid rgba(200, 150, 62, 0.15);
+    }
+    
+    .confirmation-card .info-message i {
+        color: var(--accent);
+        font-size: 1rem;
+    }
+    
+    /* Actions */
+    .confirmation-card .actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .confirmation-card .actions .btn {
+        padding: 14px 32px;
+        font-size: 0.95rem;
+        min-width: 160px;
+        justify-content: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+        .confirmation-card {
+            padding: 32px 20px;
+            margin: 0 16px;
+        }
+        
+        .confirmation-card h2 {
+            font-size: 1.4rem;
+        }
+        
+        .confirmation-card .row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 0;
+        }
+        
+        .confirmation-card .row .value {
+            width: 100%;
+        }
+        
+        .confirmation-card .actions .btn {
+            min-width: 140px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        
+        .confirmation-card .check {
+            width: 64px;
+            height: 64px;
+            font-size: 1.8rem;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .confirmation-card .actions {
+            flex-direction: column;
+        }
+        
+        .confirmation-card .actions .btn {
+            min-width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}

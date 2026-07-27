@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Patient Register — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container" style="padding:56px 0; max-width:500px; margin:0 auto;">
+  <div class="panel">
+    <div class="eyebrow">{% if is_rtl %}بوابة المرضى{% else %}Patient Portal{% endif %}</div>
+    <h2>{% if is_rtl %}إنشاء حساب{% else %}Create Account{% endif %}</h2>
+    <p style="color:var(--text-light);">{% if is_rtl %}سجل للحصول على حساب مريض وإدارة مواعيدك{% else %}Register to get a patient account and manage your appointments{% endif %}</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    
+    <form method="POST">
+      <div class="field">
+        <label>{% if is_rtl %}الاسم الكامل{% else %}Full Name{% endif %} *</label>
+        <input type="text" name="name" value="{{ form.get('name', '') }}" required>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}الاسم (العربية){% else %}Name (Arabic){% endif %}</label>
+        <input type="text" name="name_ar" value="{{ form.get('name_ar', '') }}">
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %} *</label>
+        <input type="email" name="email" value="{{ form.get('email', '') }}" required>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}رقم الهاتف{% else %}Phone{% endif %} *</label>
+        <input type="tel" name="phone" value="{{ form.get('phone', '') }}" required>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}تاريخ الميلاد{% else %}Date of Birth{% endif %}</label>
+        <input type="date" name="date_of_birth" value="{{ form.get('date_of_birth', '') }}">
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}النوع{% else %}Gender{% endif %}</label>
+        <select name="gender">
+          <option value="">{% if is_rtl %}اختر{% else %}Select{% endif %}</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}كلمة المرور{% else %}Password{% endif %} *</label>
+        <input type="password" name="password" required>
+        <small style="color:var(--text-light); font-size:0.8rem;">{% if is_rtl %}يجب أن تكون ٦ أحرف على الأقل{% else %}Minimum 6 characters{% endif %}</small>
+      </div>
+      <div class="field">
+        <label>{% if is_rtl %}تأكيد كلمة المرور{% else %}Confirm Password{% endif %} *</label>
+        <input type="password" name="confirm_password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+        <i class="fas fa-user-plus"></i> {% if is_rtl %}تسجيل{% else %}Register{% endif %}
+      </button>
+    </form>
+    
+    <p style="text-align:center; margin-top:16px;">
+      {% if is_rtl %}لديك حساب؟ <a href="{{ url_for('patient_login') }}">تسجيل الدخول</a>{% else %}Already have an account? <a href="{{ url_for('patient_login') }}">Login</a>{% endif %}
+    </p>
+  </div>
+</section>
+
+{% endblock %}

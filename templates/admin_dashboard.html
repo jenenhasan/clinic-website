@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}لوحة التحكم{% else %}Dashboard{% endif %}</div>
+      <h2>{% if is_rtl %}مرحباً في لوحة التحكم{% else %}Welcome to Admin Dashboard{% endif %}</h2>
+      <p style="color:var(--text-light);">{{ today }}</p>
+    </div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <a href="{{ url_for('admin_patients') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-users"></i> {% if is_rtl %}المرضى{% else %}Patients{% endif %}
+      </a>
+      <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-calendar"></i> {% if is_rtl %}المواعيد{% else %}Appointments{% endif %}
+      </a>
+      <a href="{{ url_for('admin_analytics') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-chart-bar"></i> {% if is_rtl %}الإحصائيات{% else %}Analytics{% endif %}
+      </a>
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-ghost btn-sm">
+        <i class="fas fa-sign-out-alt"></i> {% if is_rtl %}تسجيل الخروج{% else %}Logout{% endif %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:32px;">
+    <div class="panel reveal in-view" style="text-align:center;">
+      <div style="font-size:2.5rem; font-weight:700; color:var(--gold); font-family:var(--font-display);">{{ total_patients }}</div>
+      <div style="font-size:0.85rem; color:var(--text-light);">{% if is_rtl %}المرضى{% else %}Patients{% endif %}</div>
+    </div>
+    <div class="panel reveal in-view" style="text-align:center;">
+      <div style="font-size:2.5rem; font-weight:700; color:var(--secondary); font-family:var(--font-display);">{{ total_appointments }}</div>
+      <div style="font-size:0.85rem; color:var(--text-light);">{% if is_rtl %}المواعيد{% else %}Appointments{% endif %}</div>
+    </div>
+    <div class="panel reveal in-view" style="text-align:center;">
+      <div style="font-size:2.5rem; font-weight:700; color:var(--accent); font-family:var(--font-display);">{{ total_prescriptions }}</div>
+      <div style="font-size:0.85rem; color:var(--text-light);">{% if is_rtl %}الوصفات{% else %}Prescriptions{% endif %}</div>
+    </div>
+    <div class="panel reveal in-view" style="text-align:center;">
+      <div style="font-size:2.5rem; font-weight:700; font-family:var(--font-display); {% if pending_labs > 0 %}color:#B3453D;{% else %}color:#2E7D6B;{% endif %}">{{ pending_labs }}</div>
+      <div style="font-size:0.85rem; color:var(--text-light);">{% if is_rtl %}تحاليل معلقة{% else %}Pending Labs{% endif %}</div>
+    </div>
+  </div>
+
+  <!-- Two Column Layout -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+    
+    <!-- Left Column: Today's Appointments -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin:0;">
+          <i class="fas fa-calendar-day" style="color:var(--gold);"></i> 
+          {% if is_rtl %}مواعيد اليوم{% else %}Today's Appointments{% endif %}
+        </h3>
+        <a href="{{ url_for('admin_appointments') }}" style="font-size:0.85rem; color:var(--secondary);">{% if is_rtl %}عرض الكل{% else %}View All{% endif %}</a>
+      </div>
+      
+      {% if today_appointments %}
+        {% for apt in today_appointments %}
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-light);">
+          <div>
+            <div style="font-weight:600;">{{ apt.time }} - {{ apt.patient_name }}</div>
+            <div style="font-size:0.85rem; color:var(--text-light);">{{ apt.service_type }}</div>
+          </div>
+          <span class="status-badge {{ apt.status }}">{{ apt.status }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state" style="padding:20px;">{% if is_rtl %}لا توجد مواعيد اليوم{% else %}No appointments today{% endif %}</div>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: Quick Actions -->
+    <div class="panel">
+      <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin-bottom:16px;">
+        <i class="fas fa-bolt" style="color:var(--gold);"></i> 
+        {% if is_rtl %}إجراءات سريعة{% else %}Quick Actions{% endif %}
+      </h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <a href="{{ url_for('admin_patients') }}" class="btn btn-outline" style="justify-content:center; padding:12px;">
+          <i class="fas fa-users"></i> {% if is_rtl %}المرضى{% else %}Patients{% endif %}
+        </a>
+        <a href="{{ url_for('admin_appointments') }}" class="btn btn-outline" style="justify-content:center; padding:12px;">
+          <i class="fas fa-calendar-plus"></i> {% if is_rtl %}المواعيد{% else %}Appointments{% endif %}
+        </a>
+        <a href="{{ url_for('admin_prescriptions') }}" class="btn btn-outline" style="justify-content:center; padding:12px;">
+          <i class="fas fa-prescription"></i> {% if is_rtl %}الوصفات{% else %}Prescriptions{% endif %}
+        </a>
+        <a href="{{ url_for('admin_lab_tests') }}" class="btn btn-outline" style="justify-content:center; padding:12px;">
+          <i class="fas fa-flask"></i> {% if is_rtl %}التحاليل{% else %}Lab Tests{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Messages -->
+  {% if messages %}
+  <div class="panel" style="margin-top:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin:0;">
+        <i class="fas fa-envelope" style="color:var(--gold);"></i> 
+        {% if is_rtl %}آخر الرسائل{% else %}Recent Messages{% endif %}
+      </h3>
+      <a href="{{ url_for('admin_messages') }}" style="font-size:0.85rem; color:var(--secondary);">{% if is_rtl %}عرض الكل{% else %}View All{% endif %}</a>
+    </div>
+    {% for msg in messages %}
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-light);">
+      <div>
+        <div style="font-weight:600;">{{ msg.name }}</div>
+        <div style="font-size:0.85rem; color:var(--text-light);">{{ msg.message[:100] }}{% if msg.message|length > 100 %}...{% endif %}</div>
+      </div>
+      <span style="font-size:0.75rem; color:var(--text-light);">{{ msg.created_at[:16].replace('T', ' ') }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+<style>
+  @media (max-width: 768px) {
+    [style*="grid-template-columns: 1fr 1fr;"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
+{% endblock %}

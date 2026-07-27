@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Lab Tests — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}التحاليل{% else %}Lab Tests{% endif %}</div>
+      <h2>{% if is_rtl %}التحاليل المخبرية{% else %}Laboratory Tests{% endif %}</h2>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">
+      <i class="fas fa-arrow-left"></i> {% if is_rtl %}العودة{% else %}Back{% endif %}
+    </a>
+  </div>
+
+  {% if lab_tests %}
+  <div class="panel" style="padding:0; overflow:hidden;">
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>{% if is_rtl %}المريض{% else %}Patient{% endif %}</th>
+            <th>{% if is_rtl %}التحليل{% else %}Test{% endif %}</th>
+            <th>{% if is_rtl %}التاريخ{% else %}Date{% endif %}</th>
+            <th>{% if is_rtl %}النتيجة{% else %}Result{% endif %}</th>
+            <th>{% if is_rtl %}الحالة{% else %}Status{% endif %}</th>
+            <th>{% if is_rtl %}الإجراءات{% else %}Actions{% endif %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for test in lab_tests %}
+          <tr>
+            <td>
+              <a href="{{ url_for('admin_patient_detail', patient_id=test.patient_id) }}" style="font-weight:500; color:var(--primary);">
+                {{ test.patient_name }}
+              </a>
+            </td>
+            <td>{{ test.test_name }}</td>
+            <td>{{ test.test_date }}</td>
+            <td>{{ test.result or "—" }}</td>
+            <td>
+              <span class="status-badge {{ test.status }}">{{ test.status }}</span>
+            </td>
+            <td>
+              {% if test.status == 'pending' %}
+              <form method="POST" action="{{ url_for('admin_update_lab_test', test_id=test.id) }}" style="display:inline;">
+                <input type="text" name="result" placeholder="Result" style="width:80px; padding:2px 6px; border:1px solid var(--border-light); border-radius:var(--radius-xs); font-size:0.75rem;">
+                <button type="submit" class="btn btn-primary" style="padding:2px 8px; font-size:0.7rem;">Save</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="panel empty-state">
+    <div style="font-size:3rem; margin-bottom:16px;">🧪</div>
+    <h3 style="font-family:var(--font-primary); font-weight:600;">{% if is_rtl %}لا توجد تحاليل{% else %}No Lab Tests{% endif %}</h3>
+    <p style="color:var(--text-light);">{% if is_rtl %}لم يتم إضافة أي تحاليل مخبرية بعد{% else %}No laboratory tests have been added yet{% endif %}</p>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Home — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          {% if status.is_open %}
+          <span>
+            {% if is_rtl %}مفتوح الآن — {{ status.slots_left_today }} موعد متاح اليوم{% else %}Open Now — {{ status.slots_left_today }} slots available today{% endif %}
+          </span>
+          {% else %}
+          <span>
+            {% if is_rtl %}مغلق — احجز لليوم التالي{% else %}Closed — Book for tomorrow{% endif %}
+          </span>
+          {% endif %}
+        </div>
+        
+        <h1>{% if is_rtl %}صحتك،<br><span>أولوية لدينا</span>{% else %}Your Health,<br><span>Our Priority</span>{% endif %}</h1>
+        <p>{{ get_config('about') }}</p>
+        
+        <div class="hero-actions">
+          <a href="{{ url_for('book') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-calendar-check"></i> {% if is_rtl %}احجز موعداً{% else %}Book Appointment{% endif %}
+          </a>
+          <a href="#services" class="btn btn-outline btn-lg">
+            <i class="fas fa-chevron-down"></i> {% if is_rtl %}اعرف المزيد{% else %}Learn More{% endif %}
+          </a>
+        </div>
+        
+        <div class="hero-stats">
+          <div class="stat">
+            <h3>12+</h3>
+            <p>{% if is_rtl %}سنوات خبرة{% else %}Years Experience{% endif %}</p>
+          </div>
+          <div class="stat">
+            <h3>5,000+</h3>
+            <p>{% if is_rtl %}مرضى عولجوا{% else %}Patients Treated{% endif %}</p>
+          </div>
+          <div class="stat">
+            <h3>98%</h3>
+            <p>{% if is_rtl %}نسبة الرضا{% else %}Satisfaction Rate{% endif %}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-card">
+        <div class="doctor-info">
+          <div class="doctor-avatar">{% if is_rtl %}إم{% else %}EM{% endif %}</div>
+          <div>
+            <div class="doctor-name">{{ get_config('doctor_name') }}</div>
+            <div class="doctor-title">{{ get_config('credentials') }}</div>
+          </div>
+        </div>
+        
+        <p style="font-size:0.95rem; color:var(--text-secondary);">
+          {% if is_rtl %}احجز موعدك مباشرة مع الدكتورة مارش. مواعيد متاحة في نفس الأسبوع.{% else %}Book your appointment directly with Dr. Marsh. Same-week availability.{% endif %}
+        </p>
+        
+        <div class="appointment-stub">
+          <div class="stub-row">
+            <span class="stub-label"><i class="fas fa-stethoscope"></i> {% if is_rtl %}الخدمة{% else %}Service{% endif %}</span>
+            <span class="stub-value">{{ get_text(CONFIG.services[0].name) }}</span>
+          </div>
+          <div class="stub-row">
+            <span class="stub-label"><i class="fas fa-calendar"></i> {% if is_rtl %}التاريخ{% else %}Date{% endif %}</span>
+            <span class="stub-value">{% if is_rtl %}اختر يوم{% else %}Choose a day{% endif %}</span>
+          </div>
+          <div class="stub-row">
+            <span class="stub-label"><i class="fas fa-clock"></i> {% if is_rtl %}الوقت{% else %}Time{% endif %}</span>
+            <span class="stub-value">{% if is_rtl %}اختر موعداً{% else %}Choose a slot{% endif %}</span>
+          </div>
+        </div>
+        
+        <a href="{{ url_for('book') }}" class="btn btn-secondary" style="width:100%; margin-top:16px; justify-content:center;">
+          <i class="fas fa-arrow-right"></i> {% if is_rtl %}احجز الآن{% else %}Book Now{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="label">{% if is_rtl %}ما نقدمه{% else %}What We Offer{% endif %}</span>
+      <h2>{% if is_rtl %}رعاية شاملة{% else %}Comprehensive Care{% endif %}</h2>
+      <p>{% if is_rtl %}اختر من بين خدماتنا المصممة لتلبية احتياجاتك الصحية{% else %}Choose from our range of services designed to meet your healthcare needs{% endif %}</p>
+    </div>
+    
+    <div class="services-grid">
+      {% for s in CONFIG.services %}
+      <div class="service-card reveal">
+        <div class="icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <h3>{{ get_text(s.name) }}</h3>
+        <p>{{ get_text(s.description) }}</p>
+        <div class="meta">
+          <span><i class="far fa-clock"></i> {{ get_text(s.duration) }}</span>
+          <span class="price">{{ s.price }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <div style="text-align:center; margin-top:40px;">
+      <a href="{{ url_for('services') }}" class="btn btn-outline">
+        <i class="fas fa-arrow-right"></i> {% if is_rtl %}عرض جميع الخدمات{% else %}View All Services{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="label">{% if is_rtl %}قصص المرضى{% else %}Patient Stories{% endif %}</span>
+      <h2>{% if is_rtl %}آراء مرضانا{% else %}What Our Patients Say{% endif %}</h2>
+      <p>{% if is_rtl %}تجارب حقيقية من مرضى حقيقيين{% else %}Real experiences from real patients{% endif %}</p>
+    </div>
+    
+    <div class="testimonials-grid">
+      {% for t in CONFIG.testimonials %}
+      <div class="testimonial-card reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"{{ get_text(t.quote) }}"</blockquote>
+        <div class="author">{{ t.name }}</div>
+        <div class="author-role">{% if is_rtl %}مريض{% else %}Patient{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="label">{% if is_rtl %}أسئلة؟{% else %}Questions?{% endif %}</span>
+      <h2>{% if is_rtl %}الأسئلة الشائعة{% else %}Frequently Asked Questions{% endif %}</h2>
+      <p>{% if is_rtl %}إجابات سريعة عن أسئلة شائعة حول عيادتنا{% else %}Quick answers to common questions about our practice{% endif %}</p>
+    </div>
+    
+    <div class="faq-list">
+      {% for item in CONFIG.faqs %}
+      <details class="faq-item reveal">
+        <summary>{{ get_text(item.q) }}</summary>
+        <div class="faq-answer">{{ get_text(item.a) }}</div>
+      </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Info Strip -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="info-strip reveal">
+      <div>
+        <span class="label" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); font-weight:600;">
+          {% if is_rtl %}زورونا{% else %}Visit Us{% endif %}
+        </span>
+        <h2 style="margin:8px 0 16px;">{% if is_rtl %}موقع عيادتنا{% else %}Find Our Practice{% endif %}</h2>
+        <p>
+          {% if is_rtl %}نرحب بالحضور بدون موعد إذا كان هناك متسع في الجدول، لكن الحجز المسبق يضمن لك موعداً.{% else %}Walk-ins welcome when there's room on the schedule, but booking ahead guarantees your slot.{% endif %}
+        </p>
+        <a href="{{ url_for('contact') }}" class="btn btn-outline" style="margin-top:16px;">
+          <i class="fas fa-map-marker-alt"></i> {% if is_rtl %}احصل على الاتجاهات{% else %}Get Directions{% endif %}
+        </a>
+      </div>
+      
+      <div class="info-list">
+        <div class="info-item">
+          <span class="label"><i class="fas fa-map-pin"></i> {% if is_rtl %}العنوان{% else %}Address{% endif %}</span>
+          <span class="value">{{ get_config('address') }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label"><i class="fas fa-phone"></i> {% if is_rtl %}الهاتف{% else %}Phone{% endif %}</span>
+          <span class="value">{{ CONFIG.phone }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label"><i class="fas fa-envelope"></i> {% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</span>
+          <span class="value">{{ CONFIG.email }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label"><i class="fas fa-clock"></i> {% if is_rtl %}ساعات العمل{% else %}Hours{% endif %}</span>
+          <span class="value">{{ get_config('hours') }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  async function refreshLiveBadge() {
+    try {
+      const res = await fetch("{{ url_for('clinic_status_json') }}");
+      const data = await res.json();
+      const badge = document.querySelector('.hero-badge');
+      if (badge) {
+        const dot = badge.querySelector('.dot');
+        if (data.is_open) {
+          dot.style.background = '#22c55e';
+          const text = '{{ is_rtl|tojson }}' === 'true' 
+            ? `مفتوح الآن — ${data.slots_left_today} موعد متاح اليوم`
+            : `Open Now — ${data.slots_left_today} slots available today`;
+          badge.innerHTML = `<span class="dot"></span> ${text}`;
+        } else {
+          dot.style.background = '#94a3b8';
+          const text = '{{ is_rtl|tojson }}' === 'true' 
+            ? 'مغلق — احجز لليوم التالي'
+            : 'Closed — Book for tomorrow';
+          badge.innerHTML = `<span class="dot"></span> ${text}`;
+        }
+      }
+    } catch (e) { /* fail silently */ }
+  }
+  setInterval(refreshLiveBadge, 30000);
+</script>
+
+{% endblock %}

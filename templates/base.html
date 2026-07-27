@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if is_rtl %}dir="rtl"{% endif %}>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ get_config('business_name') }}{% endblock %}</title>
+<meta name="description" content="{{ get_config('tagline') }}">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% if is_rtl %}
+<style>
+  .main-nav { flex-direction: row-reverse; }
+  .main-nav a { margin-left: 0; margin-right: 20px; }
+  .main-nav a:first-child { margin-right: 0; }
+  .hero-content p { margin-left: 0; margin-right: auto; }
+  .hero-actions { flex-direction: row-reverse; }
+  .hero-stats { justify-content: flex-start; }
+  .section-header { text-align: right; }
+  .service-card .meta { flex-direction: row-reverse; }
+  .testimonial-card blockquote { text-align: right; }
+  .faq-item summary { flex-direction: row-reverse; }
+  .faq-item summary::after { margin-left: 0; margin-right: 12px; }
+  .field label { text-align: right; }
+  .date-row { direction: ltr; }
+  .slot-grid { direction: ltr; }
+</style>
+{% endif %}
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- BACKGROUND VIDEO - MUST BE FIRST             -->
+<!-- ============================================ -->
+<video autoplay muted loop playsinline id="bgVideo">
+  <source src="{{ url_for('static', filename='video/hero-pg.mp4') }}" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+<div class="video-overlay"></div>
+
+<!-- ============================================ -->
+<!-- HEADER                                       -->
+<!-- ============================================ -->
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-icon">{% if is_rtl %}م{% else %}M{% endif %}</span>
+      {{ get_config('business_name') }}
+    </a>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="lang-switcher">
+        <a href="{{ url_for('switch_language', lang='en') }}" class="{% if lang == 'en' %}active{% endif %}">EN</a>
+        <a href="{{ url_for('switch_language', lang='ar') }}" class="{% if lang == 'ar' %}active{% endif %}">عربي</a>
+      </div>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+      <label for="nav-toggle" class="nav-toggle" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </label>
+    </div>
+
+    <nav class="main-nav" aria-label="Main">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">
+        {% if is_rtl %}الرئيسية{% else %}Home{% endif %}
+      </a>
+      <a href="{{ url_for('about') }}" class="{{ 'active' if request.endpoint == 'about' }}">
+        {% if is_rtl %}عن العيادة{% else %}About{% endif %}
+      </a>
+      <a href="{{ url_for('services') }}" class="{{ 'active' if request.endpoint == 'services' }}">
+        {% if is_rtl %}الخدمات{% else %}Services{% endif %}
+      </a>
+      <a href="{{ url_for('contact') }}" class="{{ 'active' if request.endpoint == 'contact' }}">
+        {% if is_rtl %}اتصل بنا{% else %}Contact{% endif %}
+      </a>
+
+      {% if session.patient_id %}
+        <a href="{{ url_for('patient_dashboard') }}" class="{{ 'active' if request.endpoint == 'patient_dashboard' }}">
+          <i class="fas fa-user"></i> {% if is_rtl %}لوحة التحكم{% else %}Dashboard{% endif %}
+        </a>
+        <a href="{{ url_for('patient_logout') }}">
+          <i class="fas fa-sign-out-alt"></i> {% if is_rtl %}تسجيل الخروج{% else %}Logout{% endif %}
+        </a>
+      {% else %}
+        <a href="{{ url_for('patient_login') }}">{% if is_rtl %}تسجيل الدخول{% else %}Login{% endif %}</a>
+        <a href="{{ url_for('patient_register') }}">{% if is_rtl %}تسجيل جديد{% else %}Register{% endif %}</a>
+      {% endif %}
+
+      {% if session.is_admin %}
+      <a href="{{ url_for('admin_dashboard') }}" style="color:var(--gold);">
+        <i class="fas fa-user-md"></i> {% if is_rtl %}لوحة التحكم{% else %}Dashboard{% endif %}
+      </a>
+      <a href="{{ url_for('admin_logout') }}">
+        <i class="fas fa-sign-out-alt"></i> {% if is_rtl %}تسجيل الخروج{% else %}Logout{% endif %}
+      </a>
+      {% endif %}
+
+      <a class="btn btn-accent nav-cta" href="{{ url_for('book') }}">
+        <i class="fas fa-calendar-check"></i> {% if is_rtl %}احجز الآن{% else %}Book Now{% endif %}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT                                 -->
+<!-- ============================================ -->
+{% block content %}{% endblock %}
+
+<!-- ============================================ -->
+<!-- FOOTER                                       -->
+<!-- ============================================ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="brand" style="color:white;">{{ get_config('business_name') }}</span>
+        <p>{{ get_config('tagline') }}</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>{% if is_rtl %}روابط سريعة{% else %}Quick Links{% endif %}</h4>
+        <a href="{{ url_for('about') }}">{% if is_rtl %}عن العيادة{% else %}About{% endif %}</a>
+        <a href="{{ url_for('services') }}">{% if is_rtl %}الخدمات{% else %}Services{% endif %}</a>
+        <a href="{{ url_for('book') }}">{% if is_rtl %}حجز موعد{% else %}Book Appointment{% endif %}</a>
+        <a href="{{ url_for('contact') }}">{% if is_rtl %}اتصل بنا{% else %}Contact{% endif %}</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>{% if is_rtl %}المريض{% else %}Patient{% endif %}</h4>
+        {% if session.patient_id %}
+          <a href="{{ url_for('patient_dashboard') }}">{% if is_rtl %}لوحة التحكم{% else %}Dashboard{% endif %}</a>
+          <a href="{{ url_for('patient_logout') }}">{% if is_rtl %}تسجيل الخروج{% else %}Logout{% endif %}</a>
+        {% else %}
+          <a href="{{ url_for('patient_login') }}">{% if is_rtl %}تسجيل الدخول{% else %}Login{% endif %}</a>
+          <a href="{{ url_for('patient_register') }}">{% if is_rtl %}تسجيل جديد{% else %}Register{% endif %}</a>
+        {% endif %}
+      </div>
+
+      <div class="footer-col">
+        <h4>{% if is_rtl %}الدعم{% else %}Support{% endif %}</h4>
+        <a href="{{ url_for('admin_login') }}">{% if is_rtl %}دخول الموظفين{% else %}Staff Login{% endif %}</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>{% if is_rtl %}اتصل بنا{% else %}Contact{% endif %}</h4>
+        <a href="tel:{{ CONFIG.phone }}"><i class="fas fa-phone"></i> {{ CONFIG.phone }}</a>
+        <a href="mailto:{{ CONFIG.email }}"><i class="fas fa-envelope"></i> {{ CONFIG.email }}</a>
+        <a href="#"><i class="fas fa-map-marker-alt"></i> {{ get_config('address') }}</a>
+        <a href="#"><i class="fas fa-clock"></i> {{ get_config('hours') }}</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2024 {{ get_config('business_name') }}. {% if is_rtl %}جميع الحقوق محفوظة{% else %}All rights reserved{% endif %}.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- SCRIPTS                                      -->
+<!-- ============================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+
+<script>
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+</script>
+
+</body>
+</html>

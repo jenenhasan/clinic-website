@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% block title %}About — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<!-- ====== ABOUT HERO ====== -->
+<section class="about-hero" id="about-hero">
+  <div class="container">
+    <div class="about-hero-content">
+      <span class="label animate-fade-up">{% if is_rtl %}عن العيادة{% else %}About Us{% endif %}</span>
+      <h1 class="animate-fade-up" style="animation-delay: 0.1s;">{{ get_config('doctor_name') }}</h1>
+      <p class="credentials animate-fade-up" style="animation-delay: 0.2s;">{{ get_config('credentials') }}</p>
+      
+      <div class="quote-block animate-fade-up" style="animation-delay: 0.3s;">
+        <p>{% if is_rtl %}"الرعاية الصحية الشخصية تبدأ بفهم المريض كشخص وليس كحالة"{% else %}"Personalized healthcare starts with understanding the patient as a person, not just a case."{% endif %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== BACKGROUND SECTION ====== -->
+<section class="section section-glass" id="background">
+  <div class="container">
+    <div class="content-block glass-card">
+      <h2 class="reveal">{% if is_rtl %}الخلفية{% else %}Background{% endif %}</h2>
+      <p class="reveal">{{ get_config('bio') }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== CREDENTIALS SECTION ====== -->
+<section class="section section-glass" id="credentials">
+  <div class="container">
+    <div class="content-block">
+      <h2 class="reveal" style="color: white !important; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
+        {% if is_rtl %}المؤهلات{% else %}Credentials{% endif %}
+      </h2>
+      <ul class="credentials-list">
+        {% for c in get_config('credentials_list') %}
+        <li class="reveal glass-card" style="transition-delay: {{ loop.index * 0.05 }}s; background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); color: white !important;">
+          <i class="fas fa-check-circle" style="color: var(--accent-light);"></i> {{ c }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PHILOSOPHY / PILLARS ====== -->
+<section class="section section-glass" id="philosophy">
+  <div class="container">
+    <div class="section-header">
+      <span class="label reveal" style="color: var(--accent-light);">{% if is_rtl %}نهجنا{% else %}Our Approach{% endif %}</span>
+      <h2 class="reveal" style="color: white !important; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
+        {% if is_rtl %}كيف نقدم الرعاية{% else %}How We Deliver Care{% endif %}
+      </h2>
+      <p class="reveal" style="color: rgba(255,255,255,0.8) !important;">
+        {% if is_rtl %}ثلاث ركائز أساسية توجه ممارستنا{% else %}Three core pillars guide our practice{% endif %}
+      </p>
+    </div>
+    
+    <div class="services-grid">
+      {% for p in CONFIG.philosophy_points %}
+      <div class="service-card glass-card reveal" style="transition-delay: {{ loop.index * 0.1 }}s; background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12);">
+        <div class="icon" style="background: rgba(255,255,255,0.15); color: var(--accent-light);">
+          {% if loop.index == 1 %}
+          <i class="fas fa-clock"></i>
+          {% elif loop.index == 2 %}
+          <i class="fas fa-user-md"></i>
+          {% else %}
+          <i class="fas fa-check-double"></i>
+          {% endif %}
+        </div>
+        <h3 style="color: white !important;">{{ get_text(p.title) }}</h3>
+        <p style="color: rgba(255,255,255,0.85) !important;">{{ get_text(p.text) }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ====== TESTIMONIALS ====== -->
+<section class="section section-glass" id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <span class="label reveal" style="color: var(--accent-light);">{% if is_rtl %}آراء المرضى{% else %}Testimonials{% endif %}</span>
+      <h2 class="reveal" style="color: white !important; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
+        {% if is_rtl %}ماذا يقول مرضانا{% else %}What Our Patients Say{% endif %}
+      </h2>
+    </div>
+    
+    <div class="testimonials-grid">
+      {% for t in CONFIG.testimonials %}
+      <div class="testimonial-card glass-card reveal" style="transition-delay: {{ loop.index * 0.1 }}s; background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12);">
+        <div class="stars" style="color: var(--accent-light);">★★★★★</div>
+        <blockquote style="color: white !important;">"{{ get_text(t.quote) }}"</blockquote>
+        <div class="author" style="color: white !important;">{{ t.name }}</div>
+        <div class="role" style="color: rgba(255,255,255,0.7) !important;">{% if is_rtl %}مريض{% else %}Patient{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA SECTION ====== -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="reveal" style="color: white !important; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
+      {% if is_rtl %}مستعد لتجربة رعاية صحية أفضل؟{% else %}Ready for Better Healthcare?{% endif %}
+    </h2>
+    <p class="reveal" style="color: rgba(255,255,255,0.9) !important;">
+      {% if is_rtl %}انضم إلى آلاف العائلات التي تثق بنا{% else %}Join thousands of families who trust us with their care{% endif %}
+    </p>
+    <div class="btn-group reveal">
+      <a href="{{ url_for('book') }}" class="btn btn-accent btn-lg">
+        <i class="fas fa-calendar-check"></i> {% if is_rtl %}احجز موعدك{% else %}Book Your Visit{% endif %}
+      </a>
+      <a href="{{ url_for('contact') }}" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.5); color: white;">
+        <i class="fas fa-envelope"></i> {% if is_rtl %}اتصل بنا{% else %}Contact Us{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ===== about-specific styles ===== */
+  
+  /* Make hero transparent so video shows through */
+  .about-hero {
+    padding: 120px 0 60px;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .about-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .about-hero-content .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-light) !important;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  
+  .about-hero-content h1 {
+    font-size: clamp(2.8rem, 5vw, 4rem);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white !important;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  .about-hero-content .credentials {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    margin-bottom: 32px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .about-hero-content .quote-block {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-md);
+    padding: 28px 32px;
+    border-left: 4px solid var(--accent-light);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .about-hero-content .quote-block p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: white !important;
+    line-height: 1.8;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Glass sections - video shows through */
+  .section-glass {
+    padding: 80px 0;
+    background: transparent !important;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Glass card effect */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md);
+    padding: 32px 28px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+  
+  .content-block {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .content-block h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: white !important;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .content-block p {
+    line-height: 1.9;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 1.05rem;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .credentials-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .credentials-list li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+    font-size: 1rem;
+    color: white !important;
+  }
+  
+  .credentials-list li:hover {
+    transform: translateX(6px);
+    border-color: var(--accent-light);
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+  
+  [dir="rtl"] .credentials-list li:hover {
+    transform: translateX(-6px);
+  }
+  
+  .credentials-list li i {
+    color: var(--accent-light);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  
+  /* Service cards in glass style */
+  .section-glass .service-card {
+    background: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 32px 28px;
+    text-align: center;
+    transition: all var(--transition);
+  }
+  
+  .section-glass .service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: var(--accent-light);
+  }
+  
+  .section-glass .service-card h3 {
+    color: white !important;
+  }
+  
+  .section-glass .service-card p {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+  
+  /* Testimonial cards */
+  .section-glass .testimonial-card {
+    background: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 32px 28px;
+    transition: all var(--transition);
+  }
+  
+  .section-glass .testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+  
+  .section-glass .testimonial-card blockquote {
+    color: white !important;
+  }
+  
+  .section-glass .testimonial-card .author {
+    color: white !important;
+  }
+  
+  .section-glass .testimonial-card .role {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+  
+  /* CTA Section - Glass */
+  .cta-section {
+    padding: 80px 0;
+    background: transparent !important;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .cta-section h2 {
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    color: white !important;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 16px;
+  }
+  
+  .cta-section p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-bottom: 32px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-group {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  /* ===== Animation classes ===== */
+  .animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  .reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: 100px 0 40px;
+    }
+    
+    .about-hero-content h1 {
+      font-size: 2.4rem;
+    }
+    
+    .about-hero-content .credentials {
+      font-size: 1rem;
+    }
+    
+    .about-hero-content .quote-block {
+      padding: 20px 22px;
+    }
+    
+    .about-hero-content .quote-block p {
+      font-size: 1rem;
+    }
+    
+    .content-block h2 {
+      font-size: 1.5rem;
+    }
+    
+    .content-block p {
+      font-size: 0.95rem;
+    }
+    
+    .credentials-list li {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+    
+    .section-glass {
+      padding: 50px 0;
+    }
+    
+    .glass-card {
+      padding: 24px 20px;
+    }
+  }
+</style>
+
+<script>
+  // Scroll reveal animation
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      observer.observe(el);
+    });
+  });
+</script>
+
+{% endblock %}

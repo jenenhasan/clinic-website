@@ -1,0 +1,122 @@
+<!-- templates/admin_appointments.html -->
+{% extends "base.html" %}
+{% block title %}Appointments — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}المواعيد{% else %}Appointments{% endif %}</div>
+      <h2>{{ date }}</h2>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <!-- Previous Day -->
+      <a href="{{ url_for('admin_appointments', date=(datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)).strftime('%Y-%m-%d')) }}" 
+         class="btn btn-ghost btn-sm">
+        ←
+      </a>
+      
+      <!-- Today -->
+      <a href="{{ url_for('admin_appointments', date=datetime.now().strftime('%Y-%m-%d')) }}" 
+         class="btn btn-ghost btn-sm">
+        {% if is_rtl %}اليوم{% else %}Today{% endif %}
+      </a>
+      
+      <!-- Next Day -->
+      <a href="{{ url_for('admin_appointments', date=(datetime.strptime(date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')) }}" 
+         class="btn btn-ghost btn-sm">
+        →
+      </a>
+      
+      <!-- Date Picker -->
+      <form method="GET" style="display:inline;">
+        <input type="date" name="date" value="{{ date }}" 
+               style="padding:4px 8px; border:1px solid var(--border-light); border-radius:var(--radius-sm); font-size:0.85rem;">
+        <button type="submit" class="btn btn-ghost btn-sm">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+      
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost btn-sm">
+        <i class="fas fa-arrow-left"></i> {% if is_rtl %}العودة{% else %}Back{% endif %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Appointments List -->
+  {% if appointments %}
+  <div class="panel reveal in-view" style="padding:0; overflow:hidden;">
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>{% if is_rtl %}الوقت{% else %}Time{% endif %}</th>
+            <th>{% if is_rtl %}المريض{% else %}Patient{% endif %}</th>
+            <th>{% if is_rtl %}الخدمة{% else %}Service{% endif %}</th>
+            <th>{% if is_rtl %}الحالة{% else %}Status{% endif %}</th>
+            <th>{% if is_rtl %}الإجراءات{% else %}Actions{% endif %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for apt in appointments %}
+          <tr>
+            <td><strong>{{ apt.time }}</strong></td>
+            <td>
+              <a href="{{ url_for('admin_patient_detail', patient_id=apt.patient_id) }}" style="font-weight:500; color:var(--primary);">
+                {{ apt.patient_name }}
+              </a>
+            </td>
+            <td>{{ apt.service_type }}</td>
+            <td>
+              <span class="status-badge {{ apt.status }}">{{ apt.status }}</span>
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_update_appointment_status', appointment_id=apt.id) }}" style="display:inline;">
+                <select name="status" onchange="this.form.submit()" style="padding:2px 6px; font-size:0.75rem; border:1px solid var(--border-light); border-radius:var(--radius-xs);">
+                  <option value="scheduled" {% if apt.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                  <option value="confirmed" {% if apt.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                  <option value="completed" {% if apt.status == 'completed' %}selected{% endif %}>Completed</option>
+                  <option value="cancelled" {% if apt.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Appointment Count -->
+  <div style="margin-top:16px; text-align:center; color:var(--text-light); font-size:0.9rem;">
+    {% if is_rtl %}إجمالي المواعيد:{% else %}Total Appointments:{% endif %} {{ appointments|length }}
+  </div>
+  
+  {% else %}
+  <div class="panel empty-state">
+    <div style="font-size:3rem; margin-bottom:16px;">📅</div>
+    <h3 style="font-family:var(--font-primary); font-weight:600;">{% if is_rtl %}لا توجد مواعيد{% else %}No Appointments{% endif %}</h3>
+    <p style="color:var(--text-light);">
+      {% if is_rtl %}لا توجد مواعيد لهذا التاريخ{% else %}No appointments scheduled for {{ date }}{% endif %}
+    </p>
+    <p style="font-size:0.85rem; color:var(--text-light); margin-top:8px;">
+      {% if is_rtl %}استخدم زر ← → للتنقل بين الأيام{% else %}Use the ← → buttons to navigate between days{% endif %}
+    </p>
+  </div>
+  {% endif %}
+</section>
+
+<style>
+  @media (max-width: 768px) {
+    [style*="display:flex; gap:8px; flex-wrap:wrap;"] {
+      gap: 4px !important;
+    }
+    [style*="display:flex; gap:8px; flex-wrap:wrap;"] .btn {
+      font-size: 0.75rem !important;
+      padding: 4px 10px !important;
+    }
+  }
+</style>
+
+{% endblock %}

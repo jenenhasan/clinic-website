@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Messages — {{ get_config('business_name') }}{% endblock %}
+{% block content %}
+
+<section class="container admin-shell">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="eyebrow">{% if is_rtl %}الرسائل{% else %}Messages{% endif %}</div>
+      <h2>{% if is_rtl %}رسائل التواصل{% else %}Contact Messages{% endif %}</h2>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">
+      <i class="fas fa-arrow-left"></i> {% if is_rtl %}العودة{% else %}Back{% endif %}
+    </a>
+  </div>
+
+  {% if messages %}
+  <div class="panel" style="padding:0; overflow:hidden;">
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>{% if is_rtl %}التاريخ{% else %}Date{% endif %}</th>
+            <th>{% if is_rtl %}الاسم{% else %}Name{% endif %}</th>
+            <th>{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</th>
+            <th>{% if is_rtl %}الهاتف{% else %}Phone{% endif %}</th>
+            <th>{% if is_rtl %}الرسالة{% else %}Message{% endif %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for msg in messages %}
+          <tr>
+            <td style="white-space:nowrap;">{{ msg.created_at[:16].replace('T', ' ') }}</td>
+            <td><strong>{{ msg.name }}</strong></td>
+            <td>{{ msg.email }}</td>
+            <td>{{ msg.phone or "—" }}</td>
+            <td style="max-width:300px; word-wrap:break-word;">{{ msg.message }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="panel empty-state">
+    <div style="font-size:3rem; margin-bottom:16px;">📭</div>
+    <h3 style="font-family:var(--font-primary); font-weight:600;">{% if is_rtl %}لا توجد رسائل{% else %}No Messages{% endif %}</h3>
+    <p style="color:var(--text-light);">{% if is_rtl %}لم يتم استلام أي رسائل بعد{% else %}No messages have been received yet{% endif %}</p>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}
