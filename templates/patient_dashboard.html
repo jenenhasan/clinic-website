@@ -1,67 +1,80 @@
 {% extends "base.html" %}
-{% block title %}My Dashboard — {{ get_config('business_name') }}{% endblock %}
+
 {% block content %}
-
-<section class="container" style="padding:56px 0;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
-    <div>
-      <div class="eyebrow">{% if is_rtl %}لوحة التحكم{% else %}Dashboard{% endif %}</div>
-      <h2>{% if is_rtl %}مرحباً، {{ session.patient_name }}{% else %}Welcome, {{ session.patient_name }}{% endif %}</h2>
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Welcome, {{ session.patient_name }}!</h1>
+            <p class="lead">Manage your appointments and book new visits.</p>
+            
+            <div class="my-4">
+                <a href="{{ url_for('patient_book') }}" class="btn btn-primary btn-lg">
+                    📅 Book New Appointment
+                </a>
+                <a href="{{ url_for('patient_logout') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                    Logout
+                </a>
+            </div>
+        </div>
     </div>
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-      <a href="{{ url_for('patient_book') }}" class="btn btn-primary">
-        <i class="fas fa-calendar-plus"></i> {% if is_rtl %}موعد جديد{% else %}New Appointment{% endif %}
-      </a>
-      <a href="{{ url_for('patient_logout') }}" class="btn btn-ghost">
-        <i class="fas fa-sign-out-alt"></i> {% if is_rtl %}تسجيل الخروج{% else %}Logout{% endif %}
-      </a>
-    </div>
-  </div>
-  
-  <div class="panel">
-    <h3 style="font-family:var(--font-primary); font-size:1.1rem; margin-bottom:16px;">
-      <i class="fas fa-calendar-check" style="color:var(--gold);"></i> {% if is_rtl %}مواعيدي{% else %}My Appointments{% endif %}
-    </h3>
     
-    {% if appointments %}
-      {% for apt in appointments %}
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-light);">
-        <div>
-          <div style="font-weight:600;">{{ apt.date }} at {{ apt.time }}</div>
-          <div style="font-size:0.9rem; color:var(--text-light);">{{ apt.service_type }}</div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Your Appointments</h3>
+            <hr>
+            
+            {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Service</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>{{ appointment.date }}</td>
+                                <td>{{ appointment.time }}</td>
+                                <td>{{ appointment.service_type }}</td>
+                                <td>
+                                    {% if appointment.status == 'scheduled' %}
+                                        <span class="badge bg-success">Scheduled</span>
+                                    {% elif appointment.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    elif appointment.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    else %}
+                                        <span class="badge bg-secondary">{{ appointment.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appointment.status != 'cancelled' %}
+                                    <form method="POST" action="{{ url_for('patient_cancel_appointment', appointment_id=appointment.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>You don't have any appointments yet.</p>
+                    <a href="{{ url_for('patient_book') }}" class="btn btn-primary">
+                        Book Your First Appointment Now
+                    </a>
+                </div>
+            {% endif %}
         </div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <span class="status-badge {{ apt.status }}">{{ apt.status }}</span>
-          {% if apt.status != 'cancelled' %}
-          <form method="POST" action="{{ url_for('patient_cancel_appointment', appointment_id=apt.id) }}" style="display:inline;">
-            <button type="submit" class="btn btn-danger" style="padding:4px 12px; font-size:0.75rem;" onclick="return confirm('Cancel this appointment?');">
-              <i class="fas fa-times"></i>
-            </button>
-          </form>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <div class="empty-state" style="padding:20px;">
-        <p>{% if is_rtl %}ليس لديك مواعيد. <a href="{{ url_for('patient_book') }}">احجز الآن</a>{% else %}No appointments. <a href="{{ url_for('patient_book') }}">Book now</a>{% endif %}</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<style>
-  .status-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  .status-badge.scheduled { background: #dbeafe; color: #1e40af; }
-  .status-badge.confirmed { background: #e7efe6; color: #3d6b45; }
-  .status-badge.completed { background: #dcfce7; color: #166534; }
-  .status-badge.cancelled { background: #fee2e2; color: #991b1b; }
-</style>
-
+    </div>
+</div>
 {% endblock %}

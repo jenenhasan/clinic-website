@@ -11,9 +11,9 @@
      --primary-light: #2A6A94;
      --primary-dark: #0E2A40;
      
-     /* Secondary - Warm Teal */
-     --secondary: #3A7A8A;
-     --secondary-light: #5A9AAA;
+     /* Secondary - Warm Teal (DARKER - FIXED) */
+     --secondary: #2A6A7A;          /* WAS: #3A7A8A - Darker for contrast */
+     --secondary-light: #4A8A9A;    /* WAS: #5A9AAA - Darker for contrast */
      
      /* Accent - Warm Gold */
      --accent: #C8963E;
@@ -26,10 +26,10 @@
      --bg-accent: #F0EDE6;
      --bg-warm: #FDFBF7;
      
-     /* Text Colors */
+     /* Text Colors (FIXED - Darker for readability) */
      --text-primary: #1A2E3A;
-     --text-secondary: #4A5A64;
-     --text-light: #8A9AA4;
+     --text-secondary: #162d3b;      /* WAS: #4A5A64 - Darker */
+     --text-light: #2e739e;          /* WAS: #8A9AA4 - MUCH Darker for visibility */
      --text-white: #FFFFFF;
      
      /* Borders */
@@ -246,13 +246,13 @@
    .btn-secondary {
      background: var(--secondary);
      color: white;
-     box-shadow: 0 4px 16px rgba(58, 122, 138, 0.25);
+     box-shadow: 0 4px 16px rgba(42, 106, 122, 0.25);
    }
    
    .btn-secondary:hover {
      background: var(--secondary-light);
      transform: translateY(-2px);
-     box-shadow: 0 8px 32px rgba(58, 122, 138, 0.35);
+     box-shadow: 0 8px 32px rgba(42, 106, 122, 0.35);
      color: white;
    }
    

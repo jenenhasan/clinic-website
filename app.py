@@ -12,15 +12,43 @@ import os
 import hashlib
 import json
 from functools import wraps
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+
+# ===========================================================================
+# CONFIGURATION - Load from environment variables (NO DEFAULTS!)
+# ===========================================================================
+
+# Secret key - MUST be set in .env
+app.secret_key = os.environ.get("SECRET_KEY")
+if app.secret_key is None:
+    raise ValueError(
+        "❌ SECRET_KEY environment variable is not set!\n"
+        "Please create a .env file with SECRET_KEY=your-secret-key\n"
+        "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))'"
+    )
+
+# Flask configuration
+app.config['DEBUG'] = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+app.config['ENV'] = os.environ.get("FLASK_ENV", "production")
+
+# Admin password - MUST be set in .env
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+if ADMIN_PASSWORD is None:
+    raise ValueError(
+        "❌ ADMIN_PASSWORD environment variable is not set!\n"
+        "Please create a .env file with ADMIN_PASSWORD=your-password"
+    )
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "clinic.db")
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # CONFIGURATION - PROFESSIONAL CONTENT
-# ---------------------------------------------------------------------------
+# ===========================================================================
 CONFIG = {
     "business_name": {
         "en": "Marsh Family Practice",
@@ -89,7 +117,7 @@ CONFIG = {
     "open_days": [0, 1, 2, 3, 4],
     "open_time": "09:00",
     "close_time": "17:00",
-    "admin_password": os.environ.get("ADMIN_PASSWORD", "willow2026"),
+    "admin_password": ADMIN_PASSWORD,  # Now from environment only! No default!
     "services": [
         {
             "id": "general",
@@ -223,9 +251,9 @@ CONFIG = {
 
 TIME_SLOTS = ["09:00", "09:45", "10:30", "11:15", "13:00", "13:45", "14:30", "15:15", "16:00"]
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # DATABASE FUNCTIONS
-# ---------------------------------------------------------------------------
+# ===========================================================================
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -374,13 +402,12 @@ def create_default_admin():
         print("=" * 50)
     conn.close()
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # AUTHENTICATION DECORATORS
-# ---------------------------------------------------------------------------
+# ===========================================================================
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Allow access to admin login page without authentication
         if request.endpoint == 'admin_login':
             return f(*args, **kwargs)
         if not session.get('is_admin'):
@@ -400,9 +427,9 @@ def patient_login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # LANGUAGE SUPPORT
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.before_request
 def before_request():
     g.lang = session.get('lang', 'en')
@@ -451,7 +478,6 @@ def clinic_status():
     close_t = datetime.strptime(CONFIG["close_time"], "%H:%M").time()
     is_open = now.weekday() in CONFIG["open_days"] and open_t <= now.time() <= close_t
     
-    # Count available slots today
     today_str = now.strftime("%Y-%m-%d")
     booked_today = booked_times_for_date(today_str)
     remaining_today = [t for t in TIME_SLOTS if t not in booked_today and datetime.strptime(t, "%H:%M").time() > now.time()]
@@ -476,18 +502,18 @@ def next_available_dates(n=10):
             dates.append((d.strftime("%Y-%m-%d"), d.strftime("%a, %b %d")))
     return dates
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # LANGUAGE SWITCH
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.route('/switch-language/<lang>')
 def switch_language(lang):
     if lang in ['en', 'ar']:
         session['lang'] = lang
     return redirect(request.referrer or url_for('index'))
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # PUBLIC ROUTES (No Login Required)
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.route("/")
 def index():
     return render_template("index.html", status=clinic_status())
@@ -524,9 +550,9 @@ def contact():
     
     return render_template("contact.html", form={})
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # BOOKING ROUTES (Public - No Login Required)
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.route("/book", methods=["GET", "POST"])
 def book():
     dates = next_available_dates()
@@ -613,9 +639,9 @@ def booked_times():
 def clinic_status_json():
     return clinic_status()
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # PATIENT PORTAL ROUTES
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.route("/patient/register", methods=["GET", "POST"])
 def patient_register():
     if request.method == "POST":
@@ -782,12 +808,11 @@ def patient_cancel_appointment(appointment_id):
     conn.close()
     return redirect(url_for("patient_dashboard"))
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # ADMIN ROUTES (Login Required)
-# ---------------------------------------------------------------------------
+# ===========================================================================
 @app.route("/admin", methods=["GET", "POST"])
 def admin_login():
-    # If already logged in, go to dashboard
     if session.get('is_admin'):
         return redirect(url_for("admin_dashboard"))
     
@@ -812,7 +837,6 @@ def admin_dashboard():
     conn = get_db()
     today = datetime.now().strftime("%Y-%m-%d")
     
-    # Today's appointments
     today_appointments = conn.execute(
         """SELECT a.*, p.name as patient_name, p.mr_number, p.phone
            FROM appointments a
@@ -822,14 +846,12 @@ def admin_dashboard():
         (today,)
     ).fetchall()
     
-    # Statistics
     total_patients = conn.execute("SELECT COUNT(*) FROM patients WHERE status = 'active'").fetchone()[0]
     total_appointments = conn.execute("SELECT COUNT(*) FROM appointments WHERE status != 'cancelled'").fetchone()[0]
     total_prescriptions = conn.execute("SELECT COUNT(*) FROM prescriptions WHERE status = 'active'").fetchone()[0]
     pending_labs = conn.execute("SELECT COUNT(*) FROM lab_tests WHERE status = 'pending'").fetchone()[0]
     pending_messages = conn.execute("SELECT COUNT(*) FROM contact_messages").fetchone()[0]
     
-    # Messages
     messages = conn.execute("SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 10").fetchall()
     
     conn.close()
@@ -872,25 +894,21 @@ def admin_patient_detail(patient_id):
         flash("Patient not found.", "error")
         return redirect(url_for("admin_patients"))
     
-    # Medical history
     medical_history = conn.execute(
         "SELECT * FROM medical_history WHERE patient_id = ? ORDER BY visit_date DESC",
         (patient_id,)
     ).fetchall()
     
-    # Prescriptions
     prescriptions = conn.execute(
         "SELECT * FROM prescriptions WHERE patient_id = ? AND status = 'active' ORDER BY prescribed_date DESC",
         (patient_id,)
     ).fetchall()
     
-    # Appointments
     appointments = conn.execute(
         "SELECT * FROM appointments WHERE patient_id = ? ORDER BY date DESC, time DESC",
         (patient_id,)
     ).fetchall()
     
-    # Lab tests
     lab_tests = conn.execute(
         "SELECT * FROM lab_tests WHERE patient_id = ? ORDER BY test_date DESC",
         (patient_id,)
@@ -1070,7 +1088,6 @@ def admin_upcoming():
     conn.close()
     return render_template("admin_upcoming.html", appointments=appointments)
 
-
 @app.route("/admin/appointment/<int:appointment_id>/status", methods=["POST"])
 @admin_required
 def admin_update_appointment_status(appointment_id):
@@ -1090,7 +1107,6 @@ def admin_update_appointment_status(appointment_id):
 def admin_analytics():
     conn = get_db()
     
-    # Monthly appointments
     monthly = conn.execute("""
         SELECT strftime('%Y-%m', date) as month, COUNT(*) as count
         FROM appointments
@@ -1099,14 +1115,12 @@ def admin_analytics():
         ORDER BY month DESC
     """).fetchall()
     
-    # Patient demographics
     gender_stats = conn.execute("""
         SELECT gender, COUNT(*) as count
         FROM patients
         GROUP BY gender
     """).fetchall()
     
-    # Top diagnoses
     diagnoses = conn.execute("""
         SELECT diagnosis, COUNT(*) as count
         FROM medical_history
@@ -1116,7 +1130,6 @@ def admin_analytics():
         LIMIT 10
     """).fetchall()
     
-    # Prescription trends
     prescription_trends = conn.execute("""
         SELECT medication_name, COUNT(*) as count
         FROM prescriptions
@@ -1125,7 +1138,6 @@ def admin_analytics():
         LIMIT 10
     """).fetchall()
     
-    # Lab test trends
     lab_trends = conn.execute("""
         SELECT test_name, COUNT(*) as count
         FROM lab_tests
@@ -1161,24 +1173,48 @@ def admin_logout():
     flash("You have been logged out.", "success")
     return redirect(url_for("index"))
 
-# ---------------------------------------------------------------------------
-# DEBUG ROUTE (Optional - Remove in Production)
-# ---------------------------------------------------------------------------
+# ===========================================================================
+# ERROR HANDLERS
+# ===========================================================================
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template("500.html"), 500
+
+# ===========================================================================
+# HEALTH CHECK ENDPOINT
+# ===========================================================================
+@app.route("/health")
+def health_check():
+    return {"status": "healthy", "env": app.config['ENV']}
+
+# ===========================================================================
+# DEBUG ROUTE (Remove in Production)
+# ===========================================================================
 @app.route("/debug-session")
 def debug_session():
-    return {
-        "session": dict(session),
-        "is_admin": session.get('is_admin'),
-        "user_id": session.get('user_id'),
-        "role": session.get('role'),
-        "patient_id": session.get('patient_id')
-    }
+    if app.config['DEBUG']:
+        return {
+            "session": dict(session),
+            "is_admin": session.get('is_admin'),
+            "user_id": session.get('user_id'),
+            "role": session.get('role'),
+            "patient_id": session.get('patient_id')
+        }
+    return {"error": "Not available in production"}, 404
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # MAIN
-# ---------------------------------------------------------------------------
+# ===========================================================================
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    app.run(
+        debug=app.config['DEBUG'],
+        host="0.0.0.0" if app.config['ENV'] == "production" else "127.0.0.1",
+        port=int(os.environ.get("PORT", 3000))
+    )
 else:
     init_db()

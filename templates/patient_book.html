@@ -1,61 +1,49 @@
 {% extends "base.html" %}
-{% block title %}Book Appointment — {{ get_config('business_name') }}{% endblock %}
+
 {% block content %}
-
-<section class="container" style="padding:56px 0; max-width:600px; margin:0 auto;">
-  <div class="panel">
-    <div class="eyebrow">{% if is_rtl %}حجز موعد{% else %}Book Appointment{% endif %}</div>
-    <h2>{% if is_rtl %}احجز موعدك{% else %}Book Your Appointment{% endif %}</h2>
+<div class="container py-5">
+    <h2>Book an Appointment</h2>
     
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <div class="flash flash-{{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endwith %}
-    
-    <form method="POST">
-      <div class="field">
-        <label>{% if is_rtl %}الخدمة{% else %}Service{% endif %} *</label>
-        <select name="service_id" required>
-          <option value="">{% if is_rtl %}اختر خدمة{% else %}Select a service{% endif %}</option>
-          {% for s in CONFIG.services %}
-          <option value="{{ s.id }}" {% if form.get('service_id') == s.id %}selected{% endif %}>
-            {{ get_text(s.name) }} - {{ s.price }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-      
-      <div class="field">
-        <label>{% if is_rtl %}التاريخ{% else %}Date{% endif %} *</label>
-        <select name="date" required>
-          <option value="">{% if is_rtl %}اختر تاريخ{% else %}Select a date{% endif %}</option>
-          {% for iso, label in dates %}
-          <option value="{{ iso }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      
-      <div class="field">
-        <label>{% if is_rtl %}الوقت{% else %}Time{% endif %} *</label>
-        <select name="time" required>
-          <option value="">{% if is_rtl %}اختر وقت{% else %}Select a time{% endif %}</option>
-          {% for t in TIME_SLOTS %}
-          <option value="{{ t }}">{{ t }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      
-      <div class="field">
-        <label>{% if is_rtl %}ملاحظات{% else %}Notes{% endif %}</label>
-        <textarea name="notes" rows="3">{{ form.get('notes', '') }}</textarea>
-      </div>
-      
-      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
-        <i class="fas fa-check-circle"></i> {% if is_rtl %}تأكيد الحجز{% else %}Confirm Booking{% endif %}
-      </button>
+    <form method="POST" action="{{ url_for('patient_book') }}">
+        <!-- COMPLETELY REMOVE THIS LINE -->
+        <!-- Do not have any csrf_token reference -->
+        
+        <div class="form-group">
+            <label for="service_id">Service</label>
+            <select name="service_id" id="service_id" class="form-control" required>
+                <option value="">Select a service</option>
+                {% for service in CONFIG.services %}
+                <option value="{{ service.id }}" {% if form and form.get('service_id') == service.id %}selected{% endif %}>
+                    {{ get_text(service.name) }} - {{ service.price }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date" class="form-control" 
+                   value="{{ form.get('date', '') if form else '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="time">Time</label>
+            <select name="time" id="time" class="form-control" required>
+                <option value="">Select a time</option>
+                {% for time_slot in TIME_SLOTS %}
+                <option value="{{ time_slot }}" {% if form and form.get('time') == time_slot %}selected{% endif %}>
+                    {{ time_slot }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Additional Notes</label>
+            <textarea name="notes" id="notes" class="form-control" rows="3">{{ form.get('notes', '') if form else '' }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Book Appointment</button>
     </form>
-  </div>
-</section>
-
+</div>
 {% endblock %}
