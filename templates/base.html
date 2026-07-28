@@ -31,7 +31,7 @@
 
 <style>
   /* ============================================
-     MOBILE NAV - LANGUAGE INSIDE MENU
+     MOBILE NAV - FIXED WITH JAVASCRIPT
      ============================================ */
   .mobile-only {
       display: none !important;
@@ -50,11 +50,54 @@
           display: flex !important;
       }
       
-      .main-nav {
-          padding: 16px 20px 20px !important;
+      .header-inner {
+          padding: 10px 16px !important;
+          flex-wrap: wrap !important;
+          position: relative !important;
+      }
+
+      .nav-toggle {
+          display: flex !important;
+          width: 42px !important;
+          height: 42px !important;
+          border-radius: 8px !important;
+          align-items: center !important;
+          justify-content: center !important;
           background: var(--bg-secondary) !important;
-          border-radius: 0 0 16px 16px !important;
+          border: 1px solid var(--border-light) !important;
+          cursor: pointer !important;
+          color: var(--primary) !important;
+          font-size: 1.2rem !important;
+          margin-left: auto !important;
+          padding: 0 !important;
+          z-index: 1001 !important;
+      }
+      
+      .nav-toggle:hover {
+          background: var(--bg-primary) !important;
+      }
+      
+      .main-nav {
+          display: none !important;
+          position: absolute !important;
+          top: 100% !important;
+          left: 0 !important;
+          right: 0 !important;
+          background: var(--bg-secondary) !important;
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 4px !important;
+          padding: 16px 20px 20px !important;
+          border-bottom: 1px solid var(--border-light) !important;
           box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+          border-radius: 0 0 16px 16px !important;
+          z-index: 1000 !important;
+          max-height: 80vh !important;
+          overflow-y: auto !important;
+      }
+      
+      .main-nav.open {
+          display: flex !important;
       }
       
       .main-nav a {
@@ -62,6 +105,11 @@
           font-size: 0.95rem !important;
           border-bottom: 1px solid var(--border-light) !important;
           text-align: center !important;
+          width: 100% !important;
+      }
+      
+      .main-nav a::after {
+          display: none !important;
       }
       
       .main-nav a:last-child {
@@ -72,6 +120,7 @@
           margin-top: 8px !important;
           width: 100% !important;
           justify-content: center !important;
+          border-bottom: none !important;
       }
       
       .main-nav .lang-switcher {
@@ -92,6 +141,7 @@
           flex: 1 !important;
           text-align: center !important;
           margin: 0 !important;
+          background: transparent !important;
       }
       
       .main-nav .lang-switcher a.active {
@@ -107,13 +157,8 @@
           border-right: none !important;
           border-left: 1px solid var(--border-light) !important;
       }
-      
-      .header-inner {
-          padding: 10px 16px !important;
-      }
   }
 </style>
-
 </head>
 <body>
 
@@ -136,21 +181,19 @@
       {{ get_config('business_name') }}
     </a>
 
-    <div style="display:flex; align-items:center; gap:12px;">
-      <!-- Language Switcher - Desktop -->
-      <div class="lang-switcher desktop-only">
-        <a href="{{ url_for('switch_language', lang='en') }}" class="{% if lang == 'en' %}active{% endif %}">EN</a>
-        <a href="{{ url_for('switch_language', lang='ar') }}" class="{% if lang == 'ar' %}active{% endif %}">عربي</a>
-      </div>
-
-      <!-- Mobile Menu Toggle -->
-      <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
-      <label for="nav-toggle" class="nav-toggle" aria-label="Toggle menu">
-        <i class="fas fa-bars"></i>
-      </label>
+    <!-- Language Switcher - Desktop -->
+    <div class="lang-switcher desktop-only">
+      <a href="{{ url_for('switch_language', lang='en') }}" class="{% if lang == 'en' %}active{% endif %}">EN</a>
+      <a href="{{ url_for('switch_language', lang='ar') }}" class="{% if lang == 'ar' %}active{% endif %}">عربي</a>
     </div>
 
-    <nav class="main-nav" aria-label="Main">
+    <!-- Mobile Menu Toggle - BUTTON with onclick -->
+    <button class="nav-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- MAIN NAV -->
+    <nav class="main-nav" id="mainNav" aria-label="Main">
       <!-- Language Switcher - Mobile (inside menu) -->
       <div class="lang-switcher mobile-only">
         <a href="{{ url_for('switch_language', lang='en') }}" class="{% if lang == 'en' %}active{% endif %}">EN</a>
@@ -268,6 +311,72 @@
       header.classList.add('scrolled');
     } else {
       header.classList.remove('scrolled');
+    }
+  });
+
+  // ============================================
+  // MOBILE MENU TOGGLE - FIXED
+  // ============================================
+  function toggleMobileMenu() {
+    const nav = document.getElementById('mainNav');
+    const icon = document.querySelector('.nav-toggle i');
+    
+    if (nav) {
+      nav.classList.toggle('open');
+      
+      // Change icon from bars to times (X)
+      if (nav.classList.contains('open')) {
+        icon.className = 'fas fa-times';
+      } else {
+        icon.className = 'fas fa-bars';
+      }
+    }
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(event) {
+    const nav = document.getElementById('mainNav');
+    const toggle = document.querySelector('.nav-toggle');
+    
+    if (nav && toggle) {
+      // Check if click is outside nav and outside toggle button
+      if (!nav.contains(event.target) && !toggle.contains(event.target)) {
+        nav.classList.remove('open');
+        const icon = toggle.querySelector('i');
+        if (icon) {
+          icon.className = 'fas fa-bars';
+        }
+      }
+    }
+  });
+
+  // Close menu when a link is clicked (mobile)
+  document.querySelectorAll('.main-nav a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      const nav = document.getElementById('mainNav');
+      const toggle = document.querySelector('.nav-toggle');
+      
+      if (nav && window.innerWidth <= 768) {
+        nav.classList.remove('open');
+        if (toggle) {
+          const icon = toggle.querySelector('i');
+          if (icon) {
+            icon.className = 'fas fa-bars';
+          }
+        }
+      }
+    });
+  });
+
+  // Fix for RTL
+  document.addEventListener('DOMContentLoaded', function() {
+    const dir = document.documentElement.getAttribute('dir');
+    if (dir === 'rtl') {
+      const toggle = document.querySelector('.nav-toggle');
+      if (toggle) {
+        toggle.style.marginLeft = '0';
+        toggle.style.marginRight = 'auto';
+      }
     }
   });
 </script>
